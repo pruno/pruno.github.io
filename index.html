@@ -5,53 +5,35 @@
 </head>
 <body>
   <div id="fb-root"></div>
-  <div id="prn-root"></div>
+  <a id="connect" style="visibility:hidden">Connect</a>
+  <div id="token"></div>
 <script>
 
-  var isParent = window === window.top;
+  var connect = document.getElementById('connect');
+  var token = document.getElementById('token');
 
-  if (isParent) {
-    var frame = document.createElement('iframe');
-    frame.src = window.location.href;
-    frame.style.border = '2px solid red';
-    document.getElementById('prn-root').appendChild(frame);
-  }
+  var onResponse = function(response) {
+    if (response.status === 'connected') {
+      connect.style.visibility = 'hidden';
+      token.innerHTML = FB.getAccessToken();
+    } else {
+      connect.style.visibility = 'visible';
+    }
+  }; 
 
-  var appId = isParent ? '<APP_ID_1>' : '<APP_ID_2>';
+  token.addEventListener('click', function() {
+    FB.login(onResponse,{scope:'ads_management'});
+  });
 
   window.fbAsyncInit = function() {
     FB.init({
-      appId : appId,
-      cookie : true, 
+      appId : window.location.hash.substr(1),
+      cookie : true,
       version : 'v2.2'
     });
 
-    FB.getLoginStatus(function(response) {
-      console.log(isParent ? "Parent" : "Child", response);
-    });
+    FB.getLoginStatus(onResponse);
   };
-
-  var getParent = function() {
-    return isParent ? window : window.top;
-  };
-
-  var getChild = function() {
-    return isParent ? frame.contentWindow : window;
-  };
-
-  var getParentSDK = function() {
-    return getParent().FB;
-  };
-
-  var getChildSDK = function() {
-    return getChild().FB
-  };
-
-  document.addEventListener('click', function() {
-    window.FB.login(function(data) {
-      console.log(data);
-    });
-  });
 
   // Load the SDK asynchronously
   (function(d, s, id) {
