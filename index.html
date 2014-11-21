@@ -13,7 +13,7 @@
   if (isParent) {
     var frame = document.createElement('iframe');
     frame.src = window.location.href;
-    frame.style.boder = '2px solid red';
+    frame.style.border = '2px solid red';
     document.getElementById('prn-root').appendChild(frame);
   }
 
@@ -46,6 +46,21 @@
   var getChildSDK = function() {
     return getChild().FB
   };
+
+  document.addEventListener('click', function() {
+    window.FB.login(function(data) {
+      console.log(data);
+    });
+  });
+
+  // Load the SDK asynchronously
+  (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
 
 </script>
 </body>
