@@ -1,1 +1,52 @@
-Hello World
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
+  <div id="fb-root"></div>
+  <div id="prn-root"></div>
+<script>
+
+  var isParent = window === window.top;
+
+  if (isParent) {
+    var frame = document.createElement('iframe');
+    frame.src = window.location.href;
+    frame.style.boder = '2px solid red';
+    document.getElementById('prn-root').appendChild(frame);
+  }
+
+  var appId = isParent ? 1421818188103697 : 740428526006739;
+
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId : appId',
+      cookie : true, 
+      version : 'v2.2'
+    });
+
+    FB.getLoginStatus(function(response) {
+      console.log(isParent ? "Parent" : "Child", response);
+    });
+  };
+
+  var getParent = function() {
+    return isParent ? window : window.top;
+  };
+
+  var getChild = function() {
+    return isParent ? frame.contentWindow : window;
+  };
+
+  var getParentSDK = function() {
+    return getParent().FB;
+  };
+
+  var getChildSDK = function() {
+    return getChild().FB
+  };
+
+</script>
+</body>
+</html>
