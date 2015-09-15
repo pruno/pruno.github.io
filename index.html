@@ -22,7 +22,7 @@
   }; 
 
   connect.addEventListener('click', function() {
-    FB.login(onResponse,{scope:'ads_management'});
+    FB.login(onResponse,{scope:'ads_management,email'});
   });
 
   window.fbAsyncInit = function() {
