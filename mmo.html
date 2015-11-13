@@ -4,12 +4,36 @@
   <meta charset="utf-8">
 </head>
 <body>
+  <style>
+    html
+    {
+      background-color: #F4F4F9;
+    }
+    
+    form
+    {
+      border: 1px solid #2F4550;
+      padding: 5px;
+    }
+    
+    form div {
+      margin-top: 10px;
+    }
+    
+    form imput
+    {
+      border: 1px solid #586F7C;
+      padding: 2px 5px;
+      border-radius: 3px;
+    }
+    
+  </style>
   <form name="mmo">
-    Email: <input type="email" name="email" placeholder="Email">
-    First Name: <input type="text" name="first_name" placeholder="First Name">
-    Last Name: <input type="text" name="last_name"  placeholder="Last Name">
-    Password: <input type="password" name="password" placeholder="Password">
-    <input type="submit">
+    <div>Email: <input type="email" name="email" placeholder="Email"></div>
+    <div>First Name: <input type="text" name="first_name" placeholder="First Name"></div>
+    <div>Last Name: <input type="text" name="last_name"  placeholder="Last Name"></div>
+    <div>Password: <input type="password" name="password" placeholder="Password"></div>
+    <div><input type="submit"></div>
   </form>
 
 <script>
@@ -21,7 +45,7 @@
   var autogen = function()
   {
     if (window.location.hash) {
-      var hash = window.location.hash.substr(1);
+      var hash = decodeURIComponent(window.location.hash).substr(1);
       var exp = hash.split('&');
       var map = {};
       for (var i = 0; i < exp.length; i++) {
@@ -38,10 +62,11 @@
           }
         }
       }
+      window.location.hash = '';
     }
   };
 
-  document.addEventListener('ready', autogen);
+  document.addEventListener('load', autogen);
 </script>
 </body>
 </html>
