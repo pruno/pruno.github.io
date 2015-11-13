@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
+  <form name="mmo">
+    Email: <input type="email" name="email" placeholder="Email">
+    First Name: <input type="text" name="first_name" placeholder="First Name">
+    Last Name: <input type="text" name="last_name"  placeholder="Last Name">
+    Password: <input type="password" name="password" placeholder="Password">
+    <input type="submit">
+  </form>
+
+<script>
+  var getInput = function(form_name, input_name)
+  {
+    return document.querySelector('form[name=' + form_name  + '] input[name=' + input_name + ']');
+  };
+
+  var autogen = function()
+  {
+    if (window.location.hash) {
+      var hash = window.location.hash.substr(1);
+      var exp = hash.split('&');
+      var map = {};
+      for (var i = 0; i < exp.length; i++) {
+        var pair = exp[i].split('=');
+        map[pair[0]] = pair[1];
+      }
+      
+      var form_name = map.form_name;
+      for (var i in map) {
+        if (i !== 'form_name') {
+          var input = getInput(form_name, i);
+          if (input) {
+            input.setAttribute('value', map[i]);
+          }
+        }
+      }
+    }
+  };
+
+  document.addEventListener('ready', autogen);
+</script>
+</body>
+</html>
