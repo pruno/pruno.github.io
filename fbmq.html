@@ -47,6 +47,9 @@
     config = JSON.parse(window.location.hash.length > 1 ? window.location.hash.substring(1) : '{}');
   } catch (e) {}
 
+  console.log(' > Loaded config:');
+  console.log(config);
+
   const log = (msg) => {
     const entry = document.createElement('div');
     entry.innerHTML = '> ' + msg;
