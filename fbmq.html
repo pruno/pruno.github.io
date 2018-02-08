@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <style>
+    html, body {
+      height: 100%;
+    }
+
+    .btn {
+      margin: 10% auto 5% auto;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .btn button {
+      width: 70%;
+      font-size: 50px;
+      border: 1px solid;
+    }
+
+    .log {
+      border: 3px dashed gray;
+      padding: 2%;
+      margin: 0 5%;
+      min-height: 70%;
+    }
+  </style>
+</head>
+<body>
+  <div class="main">
+    <div class="btn"></div>
+
+  </div>
+  <div class="log"></div>
+<script>
+
+  let config = {};
+  try {
+    config = JSON.parse(window.location.hash.length > 1 ? window.location.hash.substring(1) : '{}');
+  } catch (e) {}
+
+  const onClick = () => {
+    fbq('trackCustom', 'fbmq_probe', { timestamp: Math.round((new Date()).getTime() / 1000) });
+  };
+
+  window.addEventListener('load', () => {
+    const body = document.body;
+    const btn = document.createElement('button');
+    btn.innerHTML = 'Fire';
+    btn.addEventListener('click', onClick);
+    document.querySelector('.btn').appendChild(btn);
+  });
+
+
+
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+  n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+  document,'script','https://' + (config.domain || 'connect.facebook.net') + '/en_US/fbevents.js?v=next');
+
+  config.fbid && fbq('init', config.fbid);
+
+
+</script>
+</body>
+</html>
