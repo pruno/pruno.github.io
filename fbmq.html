@@ -3,8 +3,10 @@
 <head>
   <meta charset="utf-8">
   <style>
-    html, body {
+    html, body, .main {
       height: 100%;
+      margin: 0;
+      padding: 0;
     }
 
     .btn {
@@ -25,14 +27,19 @@
       margin: 0 5%;
       min-height: 70%;
     }
+
+    .log div {
+      font-size: 3vw;
+      border-bottom: 1px solid #ddd;
+      padding: 10px 15px;
+    }
   </style>
 </head>
 <body>
   <div class="main">
     <div class="btn"></div>
-
+    <div class="log"></div>
   </div>
-  <div class="log"></div>
 <script>
 
   let config = {};
@@ -40,8 +47,18 @@
     config = JSON.parse(window.location.hash.length > 1 ? window.location.hash.substring(1) : '{}');
   } catch (e) {}
 
+  const log = (msg) => {
+    const entry = document.createElement('div');
+    entry.innerHTML = '> ' + msg;
+    const canvas = document.querySelector('.log');
+    canvas.insertBefore(entry, canvas.firstChild);
+  };
+
   const onClick = () => {
-    fbq('trackCustom', 'fbmq_probe', { timestamp: Math.round((new Date()).getTime() / 1000) });
+    const date = (new Date());
+    const evt = ['fbmq_probe', { timestamp: Math.round(date.getTime() / 1000) }];
+    fbq('trackCustom', evt[0], evt[1]);
+    log('[' + date.toString() + '] ' + evt[0]);
   };
 
   window.addEventListener('load', () => {
@@ -51,8 +68,6 @@
     btn.addEventListener('click', onClick);
     document.querySelector('.btn').appendChild(btn);
   });
-
-
 
   !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
   n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
