@@ -19,6 +19,7 @@
       width: 70%;
       font-size: 50px;
       border: 1px solid;
+      margin: 20px auto;
     }
 
     .log {
@@ -64,19 +65,25 @@
     canvas.insertBefore(entry, canvas.firstChild);
   };
 
-  const onClick = () => {
+  const onClick = (evtName) => {
     const date = (new Date());
-    const evt = ['fbmq_probe', { timestamp: Math.round(date.getTime() / 1000) }];
+    const evt = [evtName, { timestamp: Math.round(date.getTime() / 1000) }];
     fbq('trackCustom', evt[0], evt[1]);
     log('[' + date.toString() + '] ' + evt[0]);
   };
 
-  window.addEventListener('load', () => {
+
+  const makeBtn = (txt, evtName) => {
     const body = document.body;
     const btn = document.createElement('button');
-    btn.innerHTML = 'Fire';
-    btn.addEventListener('click', onClick);
+    btn.innerHTML = txt;
+    btn.addEventListener('click', () => onClick.call(this, evtName));
     document.querySelector('.btn').appendChild(btn);
+  };
+
+  window.addEventListener('load', () => {
+    makeBtn('Fire Standard', 'Search');
+    makeBtn('Fire Custom', 'fbq_probe');
   });
 
   let fbqu = 'https://'
