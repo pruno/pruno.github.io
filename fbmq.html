@@ -45,7 +45,7 @@
 
   let config = {};
   try {
-    config = JSON.parse(window.location.hash.length > 1 ? window.location.hash.substring(1) : '{}');
+    config = JSON.parse(window.location.hash.length > 1 ? decodeURIComponent(window.location.hash.substring(1)) : '{}');
   } catch (e) {
     console.log(' > Config parsing failure, downgrading to bundle');
     config = {
@@ -74,17 +74,51 @@
   };
 
 
-  const makeBtn = (txt, evtName) => {
+  const makeBtn = (txt) => {
     const body = document.body;
     const btn = document.createElement('button');
     btn.innerHTML = txt;
-    btn.addEventListener('click', () => onClick.call(this, evtName));
     document.querySelector('.btn').appendChild(btn);
+    return btn;
+  };
+
+  const makeEvtBtn = (txt, evtName) => {
+    const btn = makeBtn(txt);
+    btn.addEventListener('click', () => onClick.call(this, evtName));
+    return btn;
+  };
+
+  const makeSingleUseBtn = (txt, callback) => {
+    const btn = makeBtn(txt);
+    btn.addEventListener('click', () => {
+      btn.disabled = true;
+      callback.call(btn);
+    }, { once: true });
+    return btn;
+  };
+
+  const onInjectClick = () => {
+    if (config.appid) {
+      window['fbmq_' + config.appid] = (action, event, params) => console.log('fbmq [' + config.appid + ']', action, event, params);
+    } else {
+      console.error(' ERR: invalid config ');
+    }
+  };
+
+  const onEnableClick = () => {
+    if (config.fbid && config.appid) {
+      fbq('set', 'mobileBridge', config.fbid.toString(), config.appid.toString());
+      console.log(' > Mobile bridge authorized as ' + config.fbid + ' -> ' + config.appid);
+    } else {
+      console.error(' ERR: invalid config ');
+    }
   };
 
   window.addEventListener('load', () => {
-    makeBtn('Fire Standard', 'Search');
-    makeBtn('Fire Custom', 'fbq_probe');
+    makeEvtBtn('Fire Standard', 'Search');
+    makeEvtBtn('Fire Custom', 'fbq_probe');
+    makeSingleUseBtn('Inject Native Binding', onInjectClick);
+    makeSingleUseBtn('Enable Binding', onEnableClick);
   });
 
   let fbqu = 'https://'
@@ -98,8 +132,7 @@
   t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
   document,'script',fbqu);
 
-  config.fbid && fbq('init', config.fbid);
-  config.fbid && config.appid && fbq('set', 'mobileBridge', config.fbid, config.appid);
+  config.fbid && fbq('init', config.fbid.toString());
 
 </script>
 </body>
