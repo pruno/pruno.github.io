@@ -98,9 +98,8 @@
   t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
   document,'script',fbqu);
 
-  config.fbid &&
-    fbq('init', config.fbid) &&
-    fbq('set', 'mobileBridge', config.fbid, config.appid);
+  config.fbid && fbq('init', config.fbid);
+  config.fbid && config.appid && fbq('set', 'mobileBridge', config.fbid, config.appid);
 
 </script>
 </body>
