@@ -50,8 +50,9 @@
     console.log(' > Config parsing failure, downgrading to bundle');
     config = {
       domain: "connect.pruno.sb.facebook.com",
-      fbid: 384481185065935,
-      fbqq: "v=next&no_min"
+      fbid: '384481185065935',
+      fbqq: 'v=next&no_min',
+      appid: '1234038296672681'
     };
   }
 
@@ -97,8 +98,9 @@
   t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
   document,'script',fbqu);
 
-  config.fbid && fbq('init', config.fbid);
-
+  config.fbid &&
+    fbq('init', config.fbid) &&
+    fbq('set', 'mobileBridge', config.fbid, config.appid);
 
 </script>
 </body>
