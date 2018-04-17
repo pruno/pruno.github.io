@@ -61,24 +61,12 @@
 
   class Bridge {
 
-    constructor() {
-      this.clear();
-    }
-
     getProtocol() {
       return 'fbmq-0.1';
     }
 
-    clear() {
-      this.state = {};
-    }
-
-    appendParameter(key, value) {
-      this.state[key] = value;
-    }
-
-    sendEvent(pixelID, evtName) {
-      console.log('FBMQ mock-track: [' + pixelID + ' -> ' + config.appid + ']', evtName, JSON.stringify(this.state));
+    sendEvent(pixelID, evtName, customData) {
+      console.log('FBMQ mock-track: [' + pixelID + ' -> ' + config.appid + ']', evtName, JSON.stringify(customData));
       this.clear();
     }
   }
