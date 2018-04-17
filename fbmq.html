@@ -59,6 +59,30 @@
   console.log(' > Loaded config:');
   console.log(config);
 
+  class Bridge {
+
+    constructor() {
+      this.clear();
+    }
+
+    getProtocol() {
+      return 'fbmq-0.1';
+    }
+
+    clear() {
+      this.state = {};
+    }
+
+    appendParameter(key, value) {
+      this.state[key] = value;
+    }
+
+    sendEvent(pixelID, evtName) {
+      console.log('FBMQ mock-track: [' + pixelID + ' -> ' + config.appid + ']', evtName, JSON.stringify(this.state));
+      this.clear();
+    }
+  }
+
   const log = (msg) => {
     const entry = document.createElement('div');
     entry.innerHTML = '> ' + msg;
@@ -99,7 +123,7 @@
 
   const onInjectClick = () => {
     if (config.appid) {
-      window['fbmq_' + config.appid] = (action, event, params) => console.log('fbmq [' + config.appid + ']', action, event, params);
+      window['fbmq_' + config.appid] = new Bridge();
     } else {
       console.error(' ERR: invalid config ');
     }
@@ -114,10 +138,17 @@
     }
   };
 
+  const staticBinding = config.appid && window['fbmq_' + config.appid];
+
   window.addEventListener('load', () => {
     makeEvtBtn('Fire Standard', 'Search');
     makeEvtBtn('Fire Custom', 'fbq_probe');
-    makeSingleUseBtn('Inject Native Binding', onInjectClick);
+    if (staticBinding) {
+      const btn = makeSingleUseBtn('Detected External Binding', () => {});
+      btn.disabled = true;
+    } else {
+      makeSingleUseBtn('Inject Local Binding', onInjectClick);
+    }
     makeSingleUseBtn('Enable Binding', onEnableClick);
   });
 
