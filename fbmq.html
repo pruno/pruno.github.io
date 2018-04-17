@@ -78,9 +78,10 @@
     canvas.insertBefore(entry, canvas.firstChild);
   };
 
-  const onClick = (evtName) => {
+  const onClick = (evtName, payload) => {
     const date = (new Date());
-    const evt = [evtName, { timestamp: Math.round(date.getTime() / 1000) }];
+    const base = { timestamp: Math.round(date.getTime() / 1000) };
+    const evt = [evtName, Object.assign({}, payload, base)];
     fbq('trackCustom', evt[0], evt[1]);
     log('[' + date.toString() + '] ' + evt[0]);
   };
@@ -94,9 +95,9 @@
     return btn;
   };
 
-  const makeEvtBtn = (txt, evtName) => {
+  const makeEvtBtn = (txt, evtName, payload) => {
     const btn = makeBtn(txt);
-    btn.addEventListener('click', () => onClick.call(this, evtName));
+    btn.addEventListener('click', () => onClick.call(this, evtName, payload));
     return btn;
   };
 
@@ -129,8 +130,6 @@
   const staticBinding = config.appid && window['fbmq_' + config.appid];
 
   window.addEventListener('load', () => {
-    makeEvtBtn('Fire Standard', 'Search');
-    makeEvtBtn('Fire Custom', 'fbq_probe');
     if (staticBinding) {
       const btn = makeSingleUseBtn('Detected External Binding', () => {});
       btn.disabled = true;
@@ -138,6 +137,9 @@
       makeSingleUseBtn('Inject Local Binding', onInjectClick);
     }
     makeSingleUseBtn('Enable Binding', onEnableClick);
+    makeEvtBtn('Fire Standard', 'Search');
+    makeEvtBtn('Fire Custom', 'fbq_probe');
+    makeEvtBtn('Fire 自定义事件', 'fbq_chinese_probe', { payload: '自定义事件' });
   });
 
   let fbqu = 'https://'
