@@ -137,10 +137,10 @@
       makeSingleUseBtn('Inject Local Binding', onInjectClick);
     }
     makeSingleUseBtn('Enable Binding', onEnableClick);
-    makeEvtBtn('Fire Standard', 'Search');
-    makeEvtBtn('Fire Custom', 'fbq_probe');
-    makeEvtBtn('Fire 自定义事件', 'fbq_mandarin_probe', { payload: '自定义事件' });
-    makeEvtBtn('Fire カスタムイベント', 'fbq_japanese_probe', { payload: 'カスタムイベント' });
+    makeEvtBtn('Fire Standard [ASCII]', 'Search');
+    makeEvtBtn('Fire Custom [ASCII]', 'fbmq_custom');
+    makeEvtBtn('Fire 习惯 [UTF-8]', 'fbmq_utf8', { payload: '习惯' });
+    makeEvtBtn('Fire カスタム [UTF-16]', 'fbq_utf16', { payload: 'カスタム' });
   });
 
   let fbqu = 'https://'
