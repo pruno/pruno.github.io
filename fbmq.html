@@ -80,8 +80,7 @@
     };
   }
 
-  console.log(' > Loaded config:');
-  console.log(config);
+  console.log(' > Loaded config:', config);
 
   const log = (...args) => {
     console.log(...args);
@@ -113,7 +112,7 @@
       if (typeof data !== 'object' || data === null || data instanceof Array || data instanceof Date) {
         throw new Error('Malformed customData payload');
       }
-      log('FBMQ post-process-track', pixelID, evtName, customData);
+      log('FBMQ post-process-track', evtName, data);
     }
   }
 
@@ -170,6 +169,14 @@
     }
   };
 
+  const onTriggerInvalidClick = () => {
+    if (config.fbid && config.appid) {
+      window['fbmq_' + config.appid].sendEvent(config.fbid, 'fbmq_failure', 123);
+    } else {
+      console.error(' ERR: invalid config ');
+    }
+  };
+
   const staticBinding = config.appid && window['fbmq_' + config.appid];
 
   window.addEventListener('load', () => {
@@ -184,9 +191,9 @@
     makeEvtBtn('Fire Custom [ASCII]', 'fbmq_custom', {}, { className: 'sane' });
     makeEvtBtn('Fire 习惯 [UTF-8]', 'fbmq_utf8', { payload: '习惯' }, { className: 'sane' });
     makeEvtBtn('Fire カスタム [UTF-16]', 'fbmq_utf16', { payload: 'カスタム' }, { className: 'sane' });
-    makeEvtBtn('Fire Stdanrd Param [ASCII]', 'fbmq_param', { value: 10, currency: 'USD', content_ids: ['fbmq'], content_type: 'product' }, { className: 'sane' });
+    makeEvtBtn('Fire Standard Param [ASCII]', 'fbmq_param', { value: 10, currency: 'USD', content_ids: ['fbmq'], content_type: 'product' }, { className: 'sane' });
     makeEvtBtn('Fire Invalid payload [ASCII]', 'fbmq_invalid', { value: 4e+44 }, { className: 'fault' });
-    makeBtnWithCallback('Trigger Protocol Error ', { className: 'fault' }, () =>  staticBinding ? window['fbmq_' + config.appid].sendEvent(config.fbid, 'fbmq_failure', 123) : null);
+    makeBtnWithCallback('Trigger Protocol Error ', { className: 'fault' }, onTriggerInvalidClick);
   });
 
   let fbqu = 'https://'
