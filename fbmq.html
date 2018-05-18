@@ -21,7 +21,7 @@
       width: 70%;
       font-size: 50px;
       border: 1px solid;
-      margin: 20px auto;
+      margin: 10px auto;
       background: #FFF;
       cursor: pointer;
     }
@@ -37,22 +37,26 @@
     }
 
     .log {
-      border: 3px dashed gray;
-      padding: 2%;
+      border: 2px dashed gray;
+      padding: 0;
       margin: 0 5%;
       position: absolute;
       left: 0;
       right: 0;
-      top: 900px;
+      top: 840px;
       bottom: 2%;
       overflow-x: hidden;
       overflow-y: auto;
     }
 
     .log div {
-      font-size: 3vw;
+      font-size: 1vw;
       border-bottom: 1px solid #ddd;
       padding: 10px 15px;
+    }
+
+    .log div.old {
+      opacity: .5;
     }
   </style>
 </head>
@@ -79,6 +83,25 @@
   console.log(' > Loaded config:');
   console.log(config);
 
+  const log = (...args) => {
+    console.log(...args);
+    const entry = document.createElement('div');
+    const header = args.shift();
+    const body = args
+      .map(v => typeof v === 'object' ? JSON.stringify(v) : v.toString())
+      .join(', ');
+    entry.innerHTML = '[' + new Date().toString() + '] ' + header + ': ' + body;
+    const canvas = document.querySelector('.log');
+    canvas.insertBefore(entry, canvas.firstChild);
+  };
+
+  const logTransaction = (...args) => {
+    const canvas = document.querySelector('.log');
+    Array.prototype.slice.call(canvas.childNodes)
+      .map(i => i.className = 'old');
+    log(...args);
+  };
+
   class Bridge {
 
     getProtocol() {
@@ -90,25 +113,15 @@
       if (typeof data !== 'object' || data === null || data instanceof Array || data instanceof Date) {
         throw new Error('Malformed customData payload');
       }
-      console.log('FBMQ mock-track: [' + pixelID + ' -> ' + config.appid + ']', evtName, JSON.parse(customData));
+      log('FBMQ post-process-track', pixelID, evtName, customData);
     }
   }
 
-  const log = (msg) => {
-    const entry = document.createElement('div');
-    entry.innerHTML = '> ' + msg;
-    const canvas = document.querySelector('.log');
-    canvas.insertBefore(entry, canvas.firstChild);
-  };
-
   const onClick = (evtName, payload) => {
-    const date = (new Date());
-    const base = { timestamp: Math.round(date.getTime() / 1000) };
-    const evt = [evtName, Object.assign({}, payload, base)];
+    const evt = [evtName, Object.assign({}, payload, { timestamp: Math.round(new Date().getTime() / 1000) })];
+    logTransaction.apply(undefined, ['FBMQ mock-fire'].concat(evt));
     fbq('trackCustom', evt[0], evt[1]);
-    log('[' + date.toString() + '] ' + evt[0]);
   };
-
 
   const makeBtn = (txt, attributes = {}) => {
     const body = document.body;
@@ -151,7 +164,7 @@
   const onEnableClick = () => {
     if (config.fbid && config.appid) {
       fbq('set', 'mobileBridge', config.fbid.toString(), config.appid.toString());
-      console.log(' > Mobile bridge authorized as ' + config.fbid + ' -> ' + config.appid);
+      logTransaction('Mobile bridge authorized as ' + config.fbid + ' -> ' + config.appid);
     } else {
       console.error(' ERR: invalid config ');
     }
@@ -171,8 +184,9 @@
     makeEvtBtn('Fire Custom [ASCII]', 'fbmq_custom', {}, { className: 'sane' });
     makeEvtBtn('Fire 习惯 [UTF-8]', 'fbmq_utf8', { payload: '习惯' }, { className: 'sane' });
     makeEvtBtn('Fire カスタム [UTF-16]', 'fbmq_utf16', { payload: 'カスタム' }, { className: 'sane' });
-    makeEvtBtn('Fire Invalid payload', 'fbmq_invalid', { value: 4e+44 }, { className: 'fault' });
-    makeBtnWithCallback('Fire Protocol Error ', { className: 'fault' }, () => window['fbmq_' + config.appid].sendEvent(config.fbid, 'fbmq_failure', 123));
+    makeEvtBtn('Fire Stdanrd Param [ASCII]', 'fbmq_param', { value: 10, currency: 'USD', content_ids: ['fbmq'], content_type: 'product' }, { className: 'sane' });
+    makeEvtBtn('Fire Invalid payload [ASCII]', 'fbmq_invalid', { value: 4e+44 }, { className: 'fault' });
+    makeBtnWithCallback('Trigger Protocol Error ', { className: 'fault' }, () =>  staticBinding ? window['fbmq_' + config.appid].sendEvent(config.fbid, 'fbmq_failure', 123) : null);
   });
 
   let fbqu = 'https://'
