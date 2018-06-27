@@ -1,4 +1,5 @@
 html, body {
+  font-family: 'Helvetica', 'Arial', sans-serif;
   background-color: #0dc5c1;
   position: relative;
   height: 100%;
@@ -79,6 +80,7 @@ html, body {
 
 #success > span, #failure > span {
   display: block;
-  font-size: 2em;
+  font-size: 3em;
+  font-weight: bold;
   color: #FFF;
 }
