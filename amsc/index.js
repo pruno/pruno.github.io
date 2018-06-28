@@ -1,4 +1,3 @@
-const APP_ID = 234181490713918;
 const PIXEL_ID = 284034638805007;
 const FBQ_MSLEEP = 2000;
 const POSTBACK_URL = 'https://arcane-wildwood-18928.herokuapp.com/';
@@ -21,19 +20,6 @@ const makeID = () => {
       return v.toString(16);
     }
   );
-};
-
-const willInitFB = () => {
-  return new Promise(function(resolve, reject) {
-    log('Initializing App: ' + APP_ID);
-    window.fbAsyncInit = resolve;
-  }).then(() => {
-    window.FB.init({
-      appId : APP_ID,
-      cookie : true,
-      version : 'v3.0',
-    });
-  });
 };
 
 const willInitFBQ = (externalID) => {
@@ -68,17 +54,13 @@ const completeUI = (isSuccess) => {
 
 const main = () => {
   const id = makeID();
-  const initHandles = [
-    log('Initializing ID: ' + id + ' -> ' + sha256(id)),
-    willInitFB(),
-    willInitFBQ(id),
-  ];
-
-  return Promise.all(initHandles)
+  return new Promise((resolve) => resolve())
+    .then(() => log('Initializing ID: ' + id + ' -> ' + sha256(id)))
+    .then(() => willInitFBQ(id))
     .then(() => log('Setup completed'))
     .then(() => willReport(id))
     .then(() => true)
     .catch((e) => { console.error('Catched', e); return false; })
-    .then((isSuccess) => { completeUI(isSuccess); log(isSuccess ? 'Runtiime completed' : 'Runtime failed'); } )
+    .then((isSuccess) => { completeUI(isSuccess); log(isSuccess ? 'Runtime completed' : 'Runtime failed'); } )
     .then(() => undefined);
 };
