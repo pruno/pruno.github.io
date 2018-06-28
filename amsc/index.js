@@ -58,13 +58,12 @@ const willReport = (externalID) => {
     xhr.onerror = () => fail({error: xhr.statusText});
     xhr.send(null);
   })
-    .then(() => log('ID successfullt reported'));
+    .then(() => log('ID successfully reported'));
 };
 
 const completeUI = (isSuccess) => {
   document.querySelector('#loader').style.visibility = 'hidden';
   document.querySelector(isSuccess ? '#success' : '#failure').style.visibility = 'visible';
-  log(isSuccess ? 'Completed' : 'Failed');
 };
 
 const main = () => {
@@ -76,10 +75,10 @@ const main = () => {
   ];
 
   return Promise.all(initHandles)
-    .then(() => log('App Initialized'))
+    .then(() => log('Setup completed'))
     .then(() => willReport(id))
     .then(() => true)
     .catch((e) => { console.error('Catched', e); return false; })
-    .then(completeUI)
+    .then((isSuccess) => { completeUI(isSuccess); log(isSuccess ? 'Runtiime completed' : 'Runtime failed'); } )
     .then(() => undefined);
 };
