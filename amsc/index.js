@@ -1,6 +1,7 @@
 const APP_ID = 234181490713918;
 const PIXEL_ID = 284034638805007;
 const FBQ_MSLEEP = 2000;
+const POSTBACK_URL = 'https://arcane-wildwood-18928.herokuapp.com/';
 
 const log = function() {
   if (arguments.length > 0) {
@@ -43,47 +44,40 @@ const willInitFBQ = (externalID) => {
   return new Promise(resolve => setTimeout(resolve, FBQ_MSLEEP));
 };
 
-const willFireEvent = (externalID, eventName, params) => {
-  const hash = sha256(externalID);
-  const event = Object.assign(
-    params || {},
-    {_eventName: eventName, external_id: externalID, external_hash: hash}
-  );
-  const payload = {
-    advertiser_id: '0000-0000-0000-0000',
-    advertiser_tracking_enabled: true,
-    application_tracking_enabled: true,
-    extinfo: {0: 'pcg1', 2: 'proto-0.0.1', 3: 10, 5: 'LENOVO ThinkPad T410', 6: navigator.language.replace('-', '_')},
-    ud: {extern_id: hash, extern_namespace: PIXEL_ID},
-    event: 'CUSTOM_APP_EVENTS',
-    custom_events: [event],
-  };
-  log('Firing app event: ' + eventName);
-  return new Promise(resolve => FB.api('/' + APP_ID + '/activities', 'POST', payload, resolve))
-    .then(v => {if (v.error) throw new Error(v.error.message);});
+const willReport = (externalID) => {
+  log('Reporting ID');
+  const xhr = new XMLHttpRequest();
+  xhr.open('GET', POSTBACK_URL + sha256(externalID), true);
+  return new Promise((resolve, fail) => {
+    xhr.onload = () => {
+      if (xhr.readyState === 4) {
+        const callback = xhr.status === 200 ? resolve : fail;
+        callback(JSON.parse(xhr.responseText));
+      }
+    }
+    xhr.onerror = () => fail({error: xhr.statusText});
+    xhr.send(null);
+  })
+    .then(() => log('ID successfullt reported'));
 };
-
-const willFireActivateApp = (externalID) => willFireEvent(externalID, 'fb_mobile_activate_app');
-
-const willFirePurchase = (externalID) => willFireEvent(externalID, 'fb_mobile_purchase', {value: 10.00, currency: 'USD'});
 
 const completeUI = (isSuccess) => {
   document.querySelector('#loader').style.visibility = 'hidden';
   document.querySelector(isSuccess ? '#success' : '#failure').style.visibility = 'visible';
+  log(isSuccess ? 'Completed' : 'Failed');
 };
 
 const main = () => {
   const id = makeID();
   const initHandles = [
-    log('Initializing ID: ' + id),
+    log('Initializing ID: ' + id + ' -> ' + sha256(id)),
     willInitFB(),
     willInitFBQ(id),
   ];
 
   return Promise.all(initHandles)
     .then(() => log('App Initialized'))
-    .then(() => willFireActivateApp(id))
-    .then(() => willFirePurchase(id))
+    .then(() => willReport(id))
     .then(() => true)
     .catch((e) => { console.error('Catched', e); return false; })
     .then(completeUI)
