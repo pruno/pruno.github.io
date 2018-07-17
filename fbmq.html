@@ -69,7 +69,7 @@
 
   let config = {};
   try {
-    config = JSON.parse(window.location.hash.length > 1 ? decodeURIComponent(window.location.hash.substring(1)) : '{}');
+    config = JSON.parse(window.location.hash.length > 1 ? decodeURIComponent(window.location.hash.substring(1)) : '');
   } catch (e) {
     console.log(' > Config parsing failure, downgrading to bundle');
     config = {
